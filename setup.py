@@ -1,7 +1,6 @@
 import discord
 import requests
 from discord.ext import commands
-from PIL import Image, ImageFilter
 
 api_url = "https://api.coinmarketcap.com/v1/ticker/bitcoin/"
 app_url = "https://maker.ifttt.com/trigger/bitcoin/with/key/bz7bCPAUZGqVtlhEoDItFy"
@@ -31,17 +30,10 @@ async def cat(ctx):
 @bot.command()
 async def bitcoin(ctx):
     await ctx.send(get_bitcoin())
-@bot.command()
-async def sharpen(ctx):
-    img = Image.open (ctx.message.attachment)
-    img_sharp = img.filter( ImageFilter.SHARPEN)
-    await ctx.bot.send(ctx.message.channel, img_sharp)
-
-
 
 def get_bitcoin():
     price = get_lastest_price()
-    bitcoin = ("The current value of one Bitcoin in € is: " + str(round(price), 2))
+    bitcoin = ("The current value of one Bitcoin in € is: " + str(round(price, 2)))
     return bitcoin
 
 def get_lastest_price():
