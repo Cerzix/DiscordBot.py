@@ -1,7 +1,7 @@
 import discord
 import requests
 from discord.ext import commands
-from PIL import Image, ImageFilter
+from discord.utils import get
 
 api_url = "https://api.coinmarketcap.com/v1/ticker/bitcoin/"
 app_url = "https://maker.ifttt.com/trigger/bitcoin/with/key/bz7bCPAUZGqVtlhEoDItFy"
@@ -31,13 +31,42 @@ async def cat(ctx):
 @bot.command()
 async def bitcoin(ctx):
     await ctx.send(get_bitcoin())
-@bot.command()
-async def sharpen(ctx):
-    img = Image.open (ctx.message.attachment)
-    img_sharp = img.filter( ImageFilter.SHARPEN)
-    await ctx.bot.send(ctx.message.channel, img_sharp)
+@bot.command(pass_context=True)
+async def addrole(ctx, role_id, member: discord.Member=None):
+    if not member:
+        = ctx.message.author
+    role = discord.utils.get(ctx.guild.roles, name = role_id)
+    await caller.add_roles(user, role)
 
+@bot.command(pass_context=True)
+async def quickpoll(ctx, self, question, *options: str):
+    await self.message.delete_message(ctx.message)
+    if len(options) <= 1:
+        await self.send('You need more than one option to make a poll!')
+        return
+    if len(options) > 10:
+        await self.send('You cannot make a poll for more than 10 things!')
+        return
 
+    if len(options) == 2 and options[0] == 'yes' and options[1] == 'no':
+        reactions = ['✅', '❌']
+    else:
+        reactions = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
+
+        description = []
+        for x, option in enumerate(options):
+            description += '\n {} {}'.format(reactions[x], option)
+        embed = discord.Embed(title=question, description=''.join(description))
+        react_message = await self.send(embed=embed)
+        for reaction in reactions[:len(options)]:
+            await self.ctx.message.add_reaction(reaction)
+        embed.set_footer(text='Poll ID: {}'.format(react_message.id))
+        await self.message.edit_message(react_message, embed=embed)
+
+@bot.event
+async def on_member_join(member):
+    role = discord.utils.get(member.guild.roles, name = "Adventurer")
+    await member.add_roles(role)
 
 def get_bitcoin():
     price = get_lastest_price()
