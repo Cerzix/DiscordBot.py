@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
+from youtube_dl import YoutubeDL
 
 #-----------------Main---------------------------
 
@@ -8,6 +9,7 @@ api_url = "https://api.coinmarketcap.com/v1/ticker/bitcoin/"
 app_url = "https://maker.ifttt.com/trigger/bitcoin/with/key/bz7bCPAUZGqVtlhEoDItFy"
 token = "NTk2Mjk1MDkxOTMzNDEzNDE2.XR3dOQ.9jeCsp5c6Mz-iYFGmEUSyzQ74RQ"
 botname = "GHG-Bot"
+vclient = discord.VoiceState
 
 bot = commands.Bot(command_prefix='!', description='The Official GameHuntGuild Bot, written by Cerzix', owner_id='206811900317663232', case_insensitive=True)
 
@@ -68,7 +70,10 @@ async def poll(ctx, question, *options: str):
 @bot.command(pass_context=True)
 async def addrole(ctx, role_id):
     user = ctx.message.author
-    role = discord.utils.get(ctx.message.guild.roles, name = role_id)
+    try:
+        role = discord.utils.get(ctx.message.guild.roles, name = role_id)
+    except:
+        ctx.send("Role" + str(role) + "not found")
     await user.add_roles(role)
     await ctx.send( "Role: " + "**" + str(role) + "**" + " has been assigned.")
 
@@ -81,6 +86,29 @@ async def creator(ctx):
     creator.set_footer(text="also known as Eevee")
     print(user.avatar_url)
     await ctx.message.channel.send(embed=creator)
+
+@bot.command(pass_context=True)
+async def join(ctx):
+    author = ctx.message.author
+    voice_channel = author.voice.channel
+    vclient = await voice_channel.connect()
+    return vclient
+
+@bot.command(pass_context=True)
+async def play(ctx, url, vc = vclient):
+    author = ctx.message.author
+    voice_channel = author.voice.channel
+    if  vc.channel is "":
+        channel = await voice_channel.connect()
+        player = await vc.create_ytdl_player(url)
+        player.play()
+    else:
+        player = await vc.create_ytdl_player(url)
+        player.play()
+
+def is_connected(ctx):
+    voice_client = ctx.author.voice.channel
+    return voice_client.is_connected()
 
 # # ------------------------
 
@@ -151,8 +179,7 @@ async def on_member_join(member):
 @bot.event
 async def on_raw_reaction_add(payload):
     print("payload_id" + payload.message_id)
-    
 
-#-------------------Misc.-----------------------
+#-------------------Finish---------------------
 
 bot.run(token)
