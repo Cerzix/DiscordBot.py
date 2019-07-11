@@ -6,6 +6,7 @@ from discord.utils import get
 api_url = "https://api.coinmarketcap.com/v1/ticker/bitcoin/"
 app_url = "https://maker.ifttt.com/trigger/bitcoin/with/key/bz7bCPAUZGqVtlhEoDItFy"
 token = "NTk2Mjk1MDkxOTMzNDEzNDE2.XR3dOQ.9jeCsp5c6Mz-iYFGmEUSyzQ74RQ"
+botname = "test-bot"
 
 bot = commands.Bot(command_prefix='!', description='A bot that greets the user back.')
 
@@ -39,7 +40,29 @@ async def addrole(ctx, role_id):
     await ctx.send( "Role: " + "**" + str(role) + "**" + " has been assigned.")
 
 @bot.command(pass_context=True)
-async def quickpoll(ctx, question, *options: str):
+async def delpoll(self, poll_id):
+            async for message in self.message.channel.history(limit=200):
+                print(message.content)
+                if poll_id in message.content:
+
+                    if "!delpoll" in message.content:
+                        return
+                    else:
+                        await message.delete()
+
+@bot.command(pass_context=True)
+async def poll(ctx, question, *options: str):
+    question_body = ctx.message.content.split(" ", 1)
+    question_head = question_body[1].split("|")[0]
+    print(question_body)
+    question = ctx.message.content.split("|")[1]
+    print(question)
+    options = question.split(" ")
+
+    del options[0]
+
+    print(options)
+
     await ctx.message.delete()
     if len(options) <= 1:
         await ctx.message.channel.send('You need more than one option to make a poll!')
@@ -56,12 +79,12 @@ async def quickpoll(ctx, question, *options: str):
         description = []
         for x, option in enumerate(options):
             description += '\n {} {}'.format(reactions[x], option)
-        embed = discord.Embed(title=question, description=''.join(description))
+        embed = discord.Embed(title=question_head, description=''.join(description))
         react_message = await ctx.message.channel.send(embed=embed)
         for reaction in reactions[:len(options)]:
             await react_message.add_reaction(reaction)
         embed.set_footer(text='Poll ID: {}'.format(react_message.id))
-        await react_message.edit_message(react_message, embed=embed)
+        await react_message.edit(embed=embed)
 
 @bot.event
 async def on_member_join(member):
