@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-from youtube_dl import YoutubeDL
+import youtube_dl
 import json
 
 #--------------------Main------------------------
@@ -63,7 +63,7 @@ class Polls(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True, brief="Create polls" description="This command allows you to create polls", usage="Usage: !poll <Question> | Answer1 Answer2 etc...")
+    @commands.command(pass_context=True, brief="Create polls", description="This command allows you to create polls", usage="Usage: !poll <Question> | Answer1 Answer2 etc...")
     async def poll(self, ctx, question, *options: str):
         question_body = ctx.message.content.split(" ", 1)
         question_head = question_body[1].split("|")[0]
@@ -127,7 +127,7 @@ class Events(commands.Cog):
         self.bot = bot
 
     
-    @commands.command(pass_context=True, brief="Invite Members and assign them a role" description="This command allows you to invite Members and assign them a role for reacting", usage="Usage: !invite <Announcement> | <Role to assign> <Reaction Emoji>")
+    @commands.command(pass_context=True, brief="Invite Members and assign them a role", description="This command allows you to invite Members and assign them a role for reacting", usage="Usage: !invite <Announcement> | <Role to assign> <Reaction Emoji>")
     async def invite(self, ctx):
         body = ctx.message.content.split(" ", 1)
         content = body[1].split("|")[0]
