@@ -7,7 +7,7 @@ from youtube_dl import YoutubeDL
 
 api_url = "https://api.coinmarketcap.com/v1/ticker/bitcoin/"
 app_url = "https://maker.ifttt.com/trigger/bitcoin/with/key/bz7bCPAUZGqVtlhEoDItFy"
-token = "NTk2Mjk1MDkxOTMzNDEzNDE2.XR3dOQ.9jeCsp5c6Mz-iYFGmEUSyzQ74RQ"
+token = "token goes here"
 botname = "GHG-Bot"
 vclient = discord.VoiceState
 
