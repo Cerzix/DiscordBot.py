@@ -2,13 +2,16 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 from youtube_dl import YoutubeDL
+import json
 
-#-----------------Main---------------------------
+#--------------------Main------------------------
 
-api_url = "https://api.coinmarketcap.com/v1/ticker/bitcoin/"
-app_url = "https://maker.ifttt.com/trigger/bitcoin/with/key/bz7bCPAUZGqVtlhEoDItFy"
-token = ""
-botname = "GHG-Bot"
+with open('./config/config.json', 'r') as f:
+    config = json.load(f)
+
+token = config['token']
+botname = config['info']['name']
+
 vclient = discord.VoiceState
 
 bot = commands.Bot(command_prefix='!', description='The Official GameHuntGuild Bot, written by Cerzix', owner_id='206811900317663232', case_insensitive=True)
