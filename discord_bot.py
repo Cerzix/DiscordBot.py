@@ -67,15 +67,9 @@ class Polls(commands.Cog):
     async def poll(self, ctx, question, *options: str):
         question_body = ctx.message.content.split(" ", 1)
         question_head = question_body[1].split("|")[0]
-        print(question_body)
         question = ctx.message.content.split("|")[1]
-        print(question)
         options = question.split(" ")
-
         del options[0]
-
-        print(options)
-
         await ctx.message.delete()
         if len(options) <= 1:
             await ctx.message.channel.send('You need more than one option to make a poll!')
@@ -133,30 +127,71 @@ class Events(commands.Cog):
         self.bot = bot
 
     
-@commands.command(pass_context=True, usage="Usage: !invite <Announcement> | <Role to assign> <Reaction Emoji>")
-async def invite(self, ctx):
-    body = ctx.message.content.split(" ", 1)
-    content = body[1].split("|")[0]
-    rest = body[1].split("|")[1]
-    role = rest.split(" ")[1]
-    emoji = rest.split(" ")[2]
-    emojis = await ctx.message.guild.fetch_emojis()
-    for emj in emojis:
-        print(emj)
-        if emj.name == emoji:
-            print(emj.name)
-            emoji = emj
-    sender_pic = ctx.message.author.avatar_url
-    await ctx.message.delete()
-    reaction = emoji
-    event = discord.Embed(title=content)
-    event.set_thumbnail(url=sender_pic)
-    event_message = await ctx.message.channel.send(embed=event)
-    await event_message.add_reaction(reaction)
+    @commands.command(pass_context=True, usage="Usage: !invite <Announcement> | <Role to assign> <Reaction Emoji>")
+    async def invite(self, ctx):
+        body = ctx.message.content.split(" ", 1)
+        content = body[1].split("|")[0]
+        rest = body[1].split("|")[1]
+        role = rest.split(" ")[1]
+        emoji = rest.split(" ")[2]
+        emojis = await ctx.message.guild.fetch_emojis()
+        for emj in emojis:
+            if emj.name == emoji:
+                emoji = emj
+        sender_pic = ctx.message.author.avatar_url
+        await ctx.message.delete()
+        reaction = emoji
+        role_assigned = "By reacting you will receive the following Role: " + role
+        event = discord.Embed(title=content, description=role_assigned)
+        event.set_thumbnail(url=sender_pic)
+        event_message = await ctx.message.channel.send(embed=event)
+        await event_message.add_reaction(reaction)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        print("payload_id" + payload.message_id)   
+        print(payload.user_id)
+        print(payload.message_id)
+        if payload.user_id == bot.user.id:
+            return #do nothing
+        else:
+            msg_id = payload.message_id
+            channel = bot.get_channel(payload.channel_id)
+            print(channel)
+            msg = await channel.fetch_message(msg_id)
+            msg_desc = (msg.embeds[0].description).split(":")[1]
+            role = msg_desc.split(" ")[1]
+            role_id = discord.utils.get(bot.guilds[0].roles, name = role)
+            user = bot.guilds[0].get_member(payload.user_id)
+            print(user.roles)
+            if role_id in user.roles:
+                #User already has the role
+                return
+            else:
+                print("add role")
+                await user.add_roles(role_id)
+
+    
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        print(payload.user_id)
+        print(payload.message_id)
+        if payload.user_id == bot.user.id:
+            return #do nothing
+        else:
+            msg_id = payload.message_id
+            channel = bot.get_channel(payload.channel_id)
+            print(channel)
+            msg = await channel.fetch_message(msg_id)
+            msg_desc = (msg.embeds[0].description).split(":")[1]
+            role = msg_desc.split(" ")[1]
+            role_id = discord.utils.get(bot.guilds[0].roles, name = role)
+            user = bot.guilds[0].get_member(payload.user_id)
+            print(user.roles)
+            if role_id in user.roles:
+                await user.remove_roles(role_id)
+            else:
+                #User doesnt have the role
+                return
 
 #-------------------Commands-----------------------
 
