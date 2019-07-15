@@ -38,6 +38,13 @@ class Basic(commands.Cog):
         creator.set_footer(text="also known as Eevee")
         print(user.avatar_url)
         await ctx.message.channel.send(embed=creator)
+    
+    @commands.command(pass_context=True)
+    async def purge(self, ctx, amount):
+        if int(amount) <= 200:
+            await ctx.message.channel.purge(limit=amount)
+        else:
+            await ctx.message.channel.send("Only up to 200 Messages purgeable, you tried to purge " + amount)
 
 class Roles(commands.Cog):
     def __init__(self, bot):
@@ -77,7 +84,7 @@ class Polls(commands.Cog):
         if len(options) > 10:
             await ctx.message.channel.send('You cannot make a poll for more than 10 things!')
             return
-        if options[0] == "yes" and options[1] == "no":
+        if options[0] == "yes" and options[1] == "no" and options[3] == "":
 
             reactions = ['✅', '❌']
 
